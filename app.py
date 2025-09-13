@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 # Load environment variables from the .env file
 load_dotenv()
 
-# Initialize the Flask application
+# Initialise the Flask application
 app = Flask(__name__, static_folder='static')
 
 # --- API Endpoint for the Contact Form ---
