@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nishil Patel - Backend Developer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Configure Tailwind to use the 'class' strategy for dark mode and add custom animations
+        tailwind.config = {
+          darkMode: 'class',
+          theme: {
+            extend: {
+              animation: {
+                'gradient-text': 'gradient-text 5s ease infinite',
+              },
+              keyframes: {
+                'gradient-text': {
+                  '0%, 100%': { 
+                    'background-size': '200% 200%',
+                    'background-position': 'left center' 
+                  },
+                  '50%': { 
+                    'background-size': '200% 200%',
+                    'background-position': 'right center' 
+                  },
+                },
+              },
+            },
+          },
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; 
+        }
+        /* Subtle background pattern for dark mode */
+        .dark body {
+            background-image: radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 2.5rem 2.5rem;
+        }
+        .section-fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .section-fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+    <script>
+        // --- THEME-SWITCHER LOGIC ---
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark')
+        } else {
+          document.documentElement.classList.remove('dark')
+        }
+    </script>
+</head>
+<body class="text-gray-800 dark:bg-gray-900 dark:text-gray-300 transition-colors duration-300">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white/80 dark:bg-gray-900/80 backdrop-blur-md sticky top-0 z-50 border-b border-gray-200 dark:border-gray-800">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-2xl font-bold text-gray-900 dark:text-white">Nishil Patel</a>
+            <div class="hidden md:flex space-x-8 items-center">
+                <a href="#about" class="text-gray-600 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-violet-400 transition-colors">About</a>
+                <a href="#skills" class="text-gray-600 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-violet-400 transition-colors">Skills</a>
+                <a href="#experience" class="text-gray-600 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-violet-400 transition-colors">Experience</a>
+                <a href="#projects" class="text-gray-600 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-violet-400 transition-colors">Projects</a>
+                <a href="#contact" class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-4 py-2 rounded-md hover:shadow-lg hover:shadow-indigo-500/40 transition-all">Contact</a>
+                <!-- Theme Toggle Button (Desktop) -->
+                <button id="theme-toggle" class="p-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">
+                    <i id="theme-toggle-sun-icon" class="w-5 h-5" data-lucide="sun"></i>
+                    <i id="theme-toggle-moon-icon" class="w-5 h-5" data-lucide="moon"></i>
+                </button>
+            </div>
+            <div class="flex items-center md:hidden">
+                <!-- Theme Toggle Button (Mobile) -->
+                <button id="theme-toggle-mobile" class="p-2 mr-2 rounded-md text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800">
+                    <i id="theme-toggle-sun-icon-mobile" class="w-5 h-5" data-lucide="sun"></i>
+                    <i id="theme-toggle-moon-icon-mobile" class="w-5 h-5" data-lucide="moon"></i>
+                </button>
+                <button id="mobile-menu-button">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
+        </nav>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 space-y-2">
+             <a href="#about" class="block text-gray-600 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-violet-400 transition-colors">About</a>
+             <a href="#skills" class="block text-gray-600 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-violet-400 transition-colors">Skills</a>
+             <a href="#experience" class="block text-gray-600 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-violet-400 transition-colors">Experience</a>
+             <a href="#projects" class="block text-gray-600 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-violet-400 transition-colors">Projects</a>
+             <a href="#contact" class="block bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-4 py-2 rounded-md hover:shadow-lg hover:shadow-indigo-500/40 transition-all w-full text-center">Contact</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12 md:py-20">
+
+        <!-- Hero Section -->
+        <section id="hero" class="text-center min-h-[60vh] flex flex-col items-center justify-center">
+            <img src="images/profile.jpeg" alt="Nishil Patel" class="w-32 h-32 rounded-full mb-6 border-4 border-white dark:border-gray-800 shadow-lg object-cover">
+            <h1 class="text-4xl md:text-6xl font-bold text-gray-900 dark:text-white mb-4">
+                <span class="animate-gradient-text bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-transparent bg-clip-text">
+                    Backend Developer & Problem Solver
+                </span>
+            </h1>
+            <p class="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mb-8">
+                I build robust, scalable, and efficient backend systems, with a passion for distributed systems and competitive programming. Currently based in Ahmedabad, Gujarat.
+            </p>
+            <div class="flex space-x-4">
+                <a href="#contact" class="bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-6 py-3 rounded-md hover:shadow-lg hover:shadow-indigo-500/50 transition-all text-lg">Get in Touch</a>
+                <a href="#projects" class="bg-white text-gray-700 border border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 px-6 py-3 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all text-lg">View My Work</a>
+            </div>
+        </section>
+
+        <!-- About Me Section -->
+        <section id="about" class="py-20 section-fade-in">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 dark:text-white">About Me</h2>
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/3">
+                    <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
+                        <img src="images/profile.jpeg" alt="A professional headshot of Nishil Patel" class="rounded-lg w-full object-cover">
+                    </div>
+                </div>
+                <div class="md:w-2/3">
+                    <p class="text-lg text-gray-600 dark:text-gray-400 mb-4">
+                        Hello! I'm Nishil, an Information and Communication Technology undergraduate at Dhirubhai Ambani University. My core passion lies in backend development and complex problem-solving.
+                    </p>
+                    <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
+                        I have a strong foundation in computer science fundamentals, including Data Structures, Algorithms, DBMS, and Distributed Systems. I'm an avid competitive programmer with over 1400 problems solved on platforms like LeetCode and Codeforces. I thrive on designing and building efficient, scalable software solutions from the ground up.
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="https://www.linkedin.com/in/nishil-patel-845734253/" target="_blank" rel="noopener noreferrer" class="text-gray-500 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-violet-400"><i data-lucide="linkedin" class="w-8 h-8"></i></a>
+                        <a href="https://github.com/ShortOwl" target="_blank" rel="noopener noreferrer" class="text-gray-500 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-violet-400"><i data-lucide="github" class="w-8 h-8"></i></a>
+                        <a href="https://x.com/nishil_patel277" target="_blank" rel="noopener noreferrer" class="text-gray-500 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-violet-400"><i data-lucide="twitter" class="w-8 h-8"></i></a>
+                        <a href="https://leetcode.com/Nishil27/" target="_blank" rel="noopener noreferrer" class="text-gray-500 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-violet-400"><i data-lucide="code-2" class="w-8 h-8"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Skills Section -->
+        <section id="skills" class="py-20 bg-indigo-50 dark:bg-gray-800/50 rounded-2xl section-fade-in">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 dark:text-white">My Technical Skills</h2>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 max-w-5xl mx-auto">
+                <div class="skill-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center transition-all">
+                    <i data-lucide="code" class="w-12 h-12 mx-auto text-indigo-600 dark:text-violet-400 mb-4"></i>
+                    <h3 class="font-semibold text-lg dark:text-white">C++</h3>
+                </div>
+                <div class="skill-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center transition-all">
+                    <i data-lucide="server" class="w-12 h-12 mx-auto text-indigo-600 dark:text-violet-400 mb-4"></i>
+                    <h3 class="font-semibold text-lg dark:text-white">Python</h3>
+                </div>
+                <div class="skill-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center transition-all">
+                    <i data-lucide="database" class="w-12 h-12 mx-auto text-indigo-600 dark:text-violet-400 mb-4"></i>
+                    <h3 class="font-semibold text-lg dark:text-white">SQL (PostgreSQL)</h3>
+                </div>
+                <div class="skill-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center transition-all">
+                    <i data-lucide="git-branch-plus" class="w-12 h-12 mx-auto text-indigo-600 dark:text-violet-400 mb-4"></i>
+                    <h3 class="font-semibold text-lg dark:text-white">Git & GitHub</h3>
+                </div>
+                <div class="skill-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center transition-all">
+                    <i data-lucide="terminal-square" class="w-12 h-12 mx-auto text-indigo-600 dark:text-violet-400 mb-4"></i>
+                    <h3 class="font-semibold text-lg dark:text-white">Linux</h3>
+                </div>
+                 <div class="skill-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center transition-all">
+                    <i data-lucide="cpu" class="w-12 h-12 mx-auto text-indigo-600 dark:text-violet-400 mb-4"></i>
+                    <h3 class="font-semibold text-lg dark:text-white">Data Structures</h3>
+                </div>
+                 <div class="skill-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center transition-all">
+                    <i data-lucide="binary" class="w-12 h-12 mx-auto text-indigo-600 dark:text-violet-400 mb-4"></i>
+                    <h3 class="font-semibold text-lg dark:text-white">Algorithms</h3>
+                </div>
+                <div class="skill-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center transition-all">
+                    <i data-lucide="network" class="w-12 h-12 mx-auto text-indigo-600 dark:text-violet-400 mb-4"></i>
+                    <h3 class="font-semibold text-lg dark:text-white">Distributed Systems</h3>
+                </div>
+                <div class="skill-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center transition-all">
+                    <i data-lucide="hard-drive" class="w-12 h-12 mx-auto text-indigo-600 dark:text-violet-400 mb-4"></i>
+                    <h3 class="font-semibold text-lg dark:text-white">Operating Systems</h3>
+                </div>
+                 <div class="skill-card bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md text-center transition-all">
+                    <i data-lucide="database-zap" class="w-12 h-12 mx-auto text-indigo-600 dark:text-violet-400 mb-4"></i>
+                    <h3 class="font-semibold text-lg dark:text-white">DBMS</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section id="experience" class="py-20 section-fade-in">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 dark:text-white">Professional Experience</h2>
+            <div class="max-w-3xl mx-auto">
+                <div class="relative border-l-2 border-indigo-300 dark:border-gray-700 pl-10">
+                    <!-- Experience Item 1 -->
+                    <div class="mb-12">
+                        <div class="absolute -left-3.5 mt-1.5 w-6 h-6 bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full border-4 border-white dark:border-gray-900"></div>
+                        <p class="text-sm font-medium text-indigo-600 dark:text-violet-400">May 2025 - July 2025</p>
+                        <h3 class="text-xl font-semibold text-gray-900 dark:text-white mt-1">Summer Research Intern</h3>
+                        <p class="text-md text-gray-500 dark:text-gray-400 mb-2">Dhirubhai Ambani University, Gandhinagar</p>
+                        <ul class="list-disc list-inside text-gray-600 dark:text-gray-400 space-y-1">
+                            <li>Developed an end-to-end NLP-based fake news detection system, achieving 91+% accuracy.</li>
+                            <li>Built a scalable data preprocessing pipeline using TF-IDF and GloVe for word representations.</li>
+                            <li>Implemented and compared Logistic Regression, Naive Bayes, and simple deep learning models.</li>
+                            <li>Deployed the system as a web application with real-time prediction capabilities.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="py-20 bg-gray-50 dark:bg-gray-900/50 rounded-2xl section-fade-in">
+            <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 dark:text-white">My Projects</h2>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Project Card 1 -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden flex flex-col transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-lg hover:shadow-indigo-500/40 dark:hover:shadow-violet-500/30">
+                    <img src="images/nlp-project.jpg" alt="Fake News Detector Project" class="w-full h-48 object-cover">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-xl font-semibold mb-2 dark:text-white">Fake News Detector</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4 flex-grow">An NLP-based system to detect fake news articles with 91+% accuracy. Deployed as a live web application.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-indigo-900/50 dark:text-indigo-300">Python</span>
+                            <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-gray-700 dark:text-gray-300">NLP</span>
+                            <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900/50 dark:text-green-300">TF-IDF</span>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-yellow-900/50 dark:text-yellow-300">GloVe</span>
+                        </div>
+                        <div class="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between">
+                             <a href="https://jainilp30-fake-news-detector.hf.space" target="_blank" rel="noopener noreferrer" class="font-medium text-indigo-600 dark:text-violet-400 hover:text-indigo-800 dark:hover:text-violet-300 inline-flex items-center">
+                                <i data-lucide="play-circle" class="w-4 h-4 mr-2"></i>Live Demo
+                            </a>
+                             <a href="https://github.com/ShortOwl/Fake-News-Detector" target="_blank" rel="noopener noreferrer" class="font-medium text-indigo-600 dark:text-violet-400 hover:text-indigo-800 dark:hover:text-violet-300 inline-flex items-center">
+                                <i data-lucide="github" class="w-4 h-4 mr-2"></i>View Code
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Project Card 2 -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden flex flex-col transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-lg hover:shadow-indigo-500/40 dark:hover:shadow-violet-500/30">
+                    <img src="images/caching-project.png" alt="Distributed Cache System showing a consistent hashing ring" class="w-full h-48 object-cover">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-xl font-semibold mb-2 dark:text-white">Distributed Cache System</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4 flex-grow">A fault-tolerant, load-balanced distributed caching system using consistent hashing and replication.</p>
+                         <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-indigo-900/50 dark:text-indigo-300">Python</span>
+                            <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-gray-700 dark:text-gray-300">Sockets</span>
+                            <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-yellow-900/50 dark:text-yellow-300">Flask</span>
+                        </div>
+                        <div class="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between">
+                            <a href="https://distributed-cache-system.onrender.com/" target="_blank" rel="noopener noreferrer" class="font-medium text-indigo-600 dark:text-violet-400 hover:text-indigo-800 dark:hover:text-violet-300 inline-flex items-center">
+                                <i data-lucide="play-circle" class="w-4 h-4 mr-2"></i>Live Demo
+                            </a>
+                            <a href="https://github.com/ShortOwl" target="_blank" rel="noopener noreferrer" class="font-medium text-indigo-600 dark:text-violet-400 hover:text-indigo-800 dark:hover:text-violet-300 inline-flex items-center">
+                                <i data-lucide="github" class="w-4 h-4 mr-2"></i>View Code
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Project Card 3 -->
+                <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden flex flex-col transform hover:-translate-y-2 transition-transform duration-300 hover:shadow-lg hover:shadow-indigo-500/40 dark:hover:shadow-violet-500/30">
+                   <img src="images/database-project.jpg" alt="ConnectX Project ER Diagram" class="w-full h-48 object-cover">
+                    <div class="p-6 flex flex-col flex-grow">
+                        <h3 class="text-xl font-semibold mb-2 dark:text-white">ConnectX - Social Media DB</h3>
+                        <p class="text-gray-600 dark:text-gray-400 mb-4 flex-grow">Database management system design for a social media platform, focusing on a normalized relational schema.</p>
+                         <div class="flex flex-wrap gap-2 mb-4">
+                             <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-blue-900/50 dark:text-blue-300">SQL</span>
+                             <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-green-900/50 dark:text-green-300">PostgreSQL</span>
+                             <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-full dark:bg-red-900/50 dark:text-red-300">Database Design</span>
+                        </div>
+                        <div class="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <a href="https://github.com/ShortOwl" target="_blank" rel="noopener noreferrer" class="font-medium text-indigo-600 dark:text-violet-400 hover:text-indigo-800 dark:hover:text-violet-300 inline-flex items-center">
+                               <i data-lucide="github" class="w-4 h-4 mr-2"></i>View Code
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 section-fade-in">
+            <div class="text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 dark:text-white">
+                    <span class="bg-gradient-to-r from-indigo-500 to-violet-500 text-transparent bg-clip-text">Get In Touch</span>
+                </h2>
+                <p class="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-12">
+                    I'm always looking for new challenges and opportunities to collaborate. Whether you have a project in mind, a complex problem to solve, or just want to talk about technology, my inbox is always open.
+                </p>
+            </div>
+            <div class="max-w-5xl mx-auto grid md:grid-cols-2 gap-12 items-start">
+                <!-- Left Column: Connect Info -->
+                <div class="space-y-8">
+                    <h3 class="text-2xl font-bold dark:text-white">Let's Connect</h3>
+                    <p class="text-gray-600 dark:text-gray-400">
+                        I am actively seeking internship and full-time opportunities where I can contribute to building robust backend systems. If you have an interesting project, a potential collaboration, or a role you think I'd be a good fit for, please feel free to reach out through any of the channels below.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="flex items-start p-4 bg-white dark:bg-gray-800/50 rounded-lg">
+                            <div class="p-3 bg-indigo-100 dark:bg-gray-700 rounded-full mr-4">
+                                <i data-lucide="mail" class="w-6 h-6 text-indigo-600 dark:text-violet-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold dark:text-white">Email</h4>
+                                <p class="text-gray-600 dark:text-gray-400">nishilpatel456@gmail.com</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start p-4 bg-white dark:bg-gray-800/50 rounded-lg">
+                            <div class="p-3 bg-indigo-100 dark:bg-gray-700 rounded-full mr-4">
+                                <i data-lucide="map-pin" class="w-6 h-6 text-indigo-600 dark:text-violet-400"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold dark:text-white">Location</h4>
+                                <p class="text-gray-600 dark:text-gray-400">Ahmedabad, Gujarat</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h4 class="text-xl font-bold mb-4 dark:text-white">Connect on Social Media</h4>
+                        <div class="flex space-x-4">
+                            <a href="https://www.linkedin.com/in/nishil-patel-845734253/" target="_blank" rel="noopener noreferrer" class="p-3 bg-white dark:bg-gray-800/50 rounded-full text-gray-500 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-violet-400 transition-colors">
+                                <i data-lucide="linkedin" class="w-6 h-6"></i>
+                            </a>
+                            <a href="https://github.com/ShortOwl" target="_blank" rel="noopener noreferrer" class="p-3 bg-white dark:bg-gray-800/50 rounded-full text-gray-500 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-violet-400 transition-colors">
+                                <i data-lucide="github" class="w-6 h-6"></i>
+                            </a>
+                             <a href="https://x.com/nishil_patel277" target="_blank" rel="noopener noreferrer" class="p-3 bg-white dark:bg-gray-800/50 rounded-full text-gray-500 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-violet-400 transition-colors">
+                                <i data-lucide="twitter" class="w-6 h-6"></i>
+                            </a>
+                             <a href="https://leetcode.com/Nishil27/" target="_blank" rel="noopener noreferrer" class="p-3 bg-white dark:bg-gray-800/50 rounded-full text-gray-500 dark:text-gray-400 hover:text-indigo-500 dark:hover:text-violet-400 transition-colors">
+                                <i data-lucide="code-2" class="w-6 h-6"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Right Column: Form -->
+                <div class="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg">
+                     <h3 class="text-2xl font-bold mb-6 flex items-center dark:text-white">
+                         <i data-lucide="send" class="w-6 h-6 mr-3 text-indigo-600 dark:text-violet-400"></i> Send Message
+                     </h3>
+                    <form id="contact-form" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label for="name" class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Name*</label>
+                                <input type="text" id="name" name="name" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Your full name" required>
+                            </div>
+                            <div>
+                                <label for="email" class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Email*</label>
+                                <input type="email" id="email" name="email" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="your.email@example.com" required>
+                            </div>
+                        </div>
+                        <div>
+                             <label for="subject" class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Subject</label>
+                             <input type="text" id="subject" name="subject" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="What's this about?">
+                        </div>
+                        <div>
+                            <label for="message" class="block text-gray-700 dark:text-gray-300 font-medium mb-2">Message*</label>
+                            <textarea id="message" name="message" rows="5" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Tell me about your project, opportunity, or just say hello!" required></textarea>
+                        </div>
+                        <button type="submit" class="w-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white py-3 px-6 rounded-md hover:shadow-lg hover:shadow-indigo-500/50 transition-all text-lg font-semibold flex items-center justify-center">
+                            <i data-lucide="send" class="w-5 h-5 mr-2"></i> Send Message
+                        </button>
+                        <div id="form-message" class="mt-4 text-center"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400">
+        <div class="container mx-auto px-6 py-12">
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="md:col-span-1">
+                    <h3 class="text-xl font-bold text-white mb-4">Nishil Patel</h3>
+                    <p class="mb-4">Building scalable solutions with modern technologies and constantly learning new things to create meaningful impact.</p>
+                </div>
+                <div class="grid grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="font-semibold text-white mb-4">Quick Links</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#about" class="hover:text-violet-400 transition-colors">About</a></li>
+                            <li><a href="#projects" class="hover:text-violet-400 transition-colors">Projects</a></li>
+                            <li><a href="#skills" class="hover:text-violet-400 transition-colors">Skills</a></li>
+                            <li><a href="#contact" class="hover:text-violet-400 transition-colors">Contact</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-white mb-4">Connect</h4>
+                        <ul class="space-y-2">
+                            <li>Ahmedabad, Gujarat</li>
+                            <li>nishilpatel456@gmail.com</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-12 pt-8 border-t border-gray-800 flex flex-col sm:flex-row justify-between items-center">
+                <div class="flex space-x-4 mb-4 sm:mb-0">
+                    <a href="https://www.linkedin.com/in/nishil-patel-845734253/" target="_blank" rel="noopener noreferrer" class="p-2 bg-gray-800 rounded-full hover:bg-violet-500 transition-colors"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
+                    <a href="https://github.com/ShortOwl" target="_blank" rel="noopener noreferrer" class="p-2 bg-gray-800 rounded-full hover:bg-violet-500 transition-colors"><i data-lucide="github" class="w-5 h-5"></i></a>
+                    <a href="https://x.com/nishil_patel277" target="_blank" rel="noopener noreferrer" class="p-2 bg-gray-800 rounded-full hover:bg-violet-500 transition-colors"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                </div>
+                <p class="text-sm">&copy; 2025 Nishil Patel. Built with passion for clean code.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- Lucide Icons ---
+        lucide.createIcons();
+
+        // --- Mobile Menu Toggle ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        mobileMenuButton.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+        
+        const mobileMenuLinks = mobileMenu.getElementsByTagName('a');
+        for (let link of mobileMenuLinks) {
+            link.addEventListener('click', () => {
+                 mobileMenu.classList.add('hidden');
+            });
+        }
+
+        // --- Intersection Observer for section fade-in animation ---
+        const sections = document.querySelectorAll('.section-fade-in');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1
+        });
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+        
+        // --- THEME-SWITCHER LOGIC ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeToggleMobileBtn = document.getElementById('theme-toggle-mobile');
+        
+        const sunIcon = document.getElementById('theme-toggle-sun-icon');
+        const moonIcon = document.getElementById('theme-toggle-moon-icon');
+        const sunIconMobile = document.getElementById('theme-toggle-sun-icon-mobile');
+        const moonIconMobile = document.getElementById('theme-toggle-moon-icon-mobile');
+
+        // Function to update the icon visibility
+        const updateIcons = () => {
+            if (document.documentElement.classList.contains('dark')) {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'block';
+                sunIconMobile.style.display = 'none';
+                moonIconMobile.style.display = 'block';
+            } else {
+                sunIcon.style.display = 'block';
+                moonIcon.style.display = 'none';
+                sunIconMobile.style.display = 'block';
+                moonIconMobile.style.display = 'none';
+            }
+        };
+
+        // Function to toggle the theme
+        const toggleTheme = () => {
+            const isDarkMode = document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
+            updateIcons();
+        };
+
+        // Add event listeners
+        themeToggleBtn.addEventListener('click', toggleTheme);
+        themeToggleMobileBtn.addEventListener('click', toggleTheme);
+
+        // Initial icon state check on page load
+        updateIcons();
+
+        // --- Contact Form Logic ---
+        const contactForm = document.getElementById('contact-form');
+        const formMessage = document.getElementById('form-message');
+
+        contactForm.addEventListener('submit', async (event) => {
+            event.preventDefault(); // Prevent default page reload
+
+            const submitButton = contactForm.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.innerHTML = 'Sending...'; // Changed to innerHTML for icons
+
+            formMessage.textContent = '';
+
+            const formData = new FormData(contactForm);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    formMessage.textContent = result.message;
+                    formMessage.className = 'mt-4 text-center text-green-600';
+                    contactForm.reset();
+                } else {
+                    formMessage.textContent = result.error || 'An unexpected error occurred.';
+                    formMessage.className = 'mt-4 text-center text-red-600';
+                }
+            } catch (error) {
+                formMessage.textContent = 'A network error occurred. Please try again later.';
+                formMessage.className = 'mt-4 text-center text-red-600';
+            } finally {
+                submitButton.disabled = false;
+                submitButton.innerHTML = `<i data-lucide="send" class="w-5 h-5 mr-2"></i> Send Message`;
+                lucide.createIcons(); // Re-render the icon after changing innerHTML
+            }
+        });
+    </script>
+</body>
+</html>
+
