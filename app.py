@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Initialise the Flask application
-app = Flask(__name__, static_folder='static')
+static_folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
+app = Flask(__name__, static_folder=static_folder_path)
 
 # --- API Endpoint for the Contact Form ---
 @app.route('/api/contact', methods=['POST'])
@@ -26,33 +27,38 @@ def handle_contact_form():
         return jsonify({"error": "Missing required fields: name, email, and message."}), 400
 
     sender_email = os.getenv('SENDER_EMAIL')
-    sender_password = os.getenv('SENDER_PASSWORD')
     recipient_email = os.getenv('RECIPIENT_EMAIL')
+    smtp_host = os.getenv('SMTP_HOST')
+    smtp_port = int(os.getenv('SMTP_PORT', 587))
+    smtp_login = os.getenv('SMTP_LOGIN')
+    smtp_password = os.getenv('SMTP_PASSWORD')
 
-    if not all([sender_email, sender_password, recipient_email]):
+    if not all([sender_email, recipient_email, smtp_host, smtp_port, smtp_login, smtp_password]):
         print("ERROR: Email credentials are not set in the .env file.")
         return jsonify({"error": "Server configuration error."}), 500
 
     try:
-        # --- NEW: Constructing the email with EmailMessage for proper headers ---
+        # Construct the email
         msg = EmailMessage()
         msg['Subject'] = f"New Portfolio Contact from {name}: {subject}"
         msg['From'] = f"Nishil's Portfolio <{sender_email}>"
         msg['To'] = recipient_email
-        msg['Reply-To'] = email  # This is the crucial line!
+        msg['Reply-To'] = email
 
-        # Set the email body content
-        email_body = f"You have a new message from your portfolio website:\n\n" \
-                     f"Name: {name}\n" \
-                     f"Email: {email}\n\n" \
-                     f"Message:\n{message}"
+        email_body = (
+            f"You have a new message from your portfolio website:\n\n"
+            f"Name: {name}\n"
+            f"Email: {email}\n\n"
+            f"Message:\n{message}"
+        )
         msg.set_content(email_body)
-        
-        # Connect to the SMTP server and send the email
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
-            server.login(sender_email, sender_password)
+
+        # Connect to Brevo SMTP and send
+        with smtplib.SMTP(smtp_host, smtp_port) as server:
+            server.starttls()
+            server.login(smtp_login, smtp_password)
             server.send_message(msg)
-        
+
         return jsonify({"message": "Thank you! Your message has been sent successfully."}), 200
 
     except Exception as e:
@@ -63,20 +69,12 @@ def handle_contact_form():
 # --- Route to Serve the Frontend ---
 @app.route('/')
 def serve_index():
-    """
-    Serves the main index.html file from the 'static' folder.
-    """
     return send_from_directory(app.static_folder, 'index.html')
 
 @app.route('/<path:path>')
 def serve_static_files(path):
-    """
-    Serves other static files (like images) from the 'static' folder.
-    """
     return send_from_directory(app.static_folder, path)
 
 
-# This allows the script to be run directly
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)
-
