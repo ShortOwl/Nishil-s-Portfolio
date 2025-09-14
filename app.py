@@ -4,17 +4,12 @@ from dotenv import load_dotenv
 import sib_api_v3_sdk
 from sib_api_v3_sdk.rest import ApiException
 
-# Load environment variables from the .env file
+# Load environment variables from the .env file for local development
 load_dotenv()
 
-# Construct the absolute path to the 'static' folder for reliability on production servers
+# Construct the absolute path to the 'static' folder for reliability
 static_folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 app = Flask(__name__, static_folder=static_folder_path)
-
-# --- Brevo API Configuration ---
-configuration = sib_api_v3_sdk.Configuration()
-configuration.api_key['api-key'] = os.getenv('BREVO_API_KEY')
-api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
 
 
 # --- API Endpoint for the Contact Form ---
@@ -23,6 +18,14 @@ def handle_contact_form():
     """
     Receives contact form data, sends an email via Brevo's API, and returns a response.
     """
+    # --- THIS IS THE FIX: Configure the API client inside the request ---
+    # This ensures that the environment variables are loaded for every request,
+    # which is a more robust pattern for production servers like Render.
+    configuration = sib_api_v3_sdk.Configuration()
+    configuration.api_key['api-key'] = os.getenv('BREVO_API_KEY')
+    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
+    # --- END OF FIX ---
+
     data = request.get_json()
     name = data.get('name')
     email = data.get('email')
@@ -35,8 +38,9 @@ def handle_contact_form():
     recipient_email = os.getenv('RECIPIENT_EMAIL')
     sender_email = os.getenv('SENDER_EMAIL') # This must be a verified sender in Brevo
 
-    if not all([recipient_email, sender_email, configuration.api_key['api-key']]):
-        print("ERROR: Brevo API Key, recipient, or sender email is not set.")
+    # The API key is now checked inside the try block via the API call
+    if not all([recipient_email, sender_email]):
+        print("ERROR: Recipient or sender email is not set.")
         return jsonify({"error": "Server configuration error."}), 500
 
     # Construct the email using Brevo's SDK
@@ -61,6 +65,7 @@ def handle_contact_form():
         return jsonify({"message": "Thank you! Your message has been sent successfully."}), 200
 
     except ApiException as e:
+        # This will now give us the "Key not found" error if the key is wrong on Render
         print(f"BREVO API EXCEPTION: {e.body}")
         return jsonify({"error": "Sorry, there was a problem sending your message. Please try again later."}), 500
 
