@@ -1,76 +1,70 @@
 import os
 from flask import Flask, request, jsonify, send_from_directory
+from flask_cors import CORS
 from dotenv import load_dotenv
-import sib_api_v3_sdk
-from sib_api_v3_sdk.rest import ApiException
+import requests
 
-# Load environment variables from the .env file for local development
+# Load environment variables
 load_dotenv()
 
-# Construct the absolute path to the 'static' folder for reliability
+# Construct static folder path
 static_folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'static')
 app = Flask(__name__, static_folder=static_folder_path)
+CORS(app)
 
+# Resend config
+RESEND_API_KEY = os.getenv("RESEND_API_KEY")
+SENDER_EMAIL = os.getenv("SENDER_EMAIL", "onboarding@resend.dev")  # default to sandbox
+RECIPIENT_EMAIL = os.getenv("RECIPIENT_EMAIL")
 
-# --- API Endpoint for the Contact Form ---
-@app.route('/api/contact', methods=['POST'])
+# --- Contact Form API ---
+@app.route("/api/contact", methods=["POST"])
 def handle_contact_form():
-    """
-    Receives contact form data, sends an email via Brevo's API, and returns a response.
-    """
-    # --- THIS IS THE FIX: Configure the API client inside the request ---
-    # This ensures that the environment variables are loaded for every request,
-    # which is a more robust pattern for production servers like Render.
-    configuration = sib_api_v3_sdk.Configuration()
-    configuration.api_key['api-key'] = os.getenv('BREVO_API_KEY')
-    api_instance = sib_api_v3_sdk.TransactionalEmailsApi(sib_api_v3_sdk.ApiClient(configuration))
-    # --- END OF FIX ---
-
-    data = request.get_json()
-    name = data.get('name')
-    email = data.get('email')
-    subject = data.get('subject', 'No Subject')
-    message_body = data.get('message')
-
-    if not all([name, email, message_body]):
-        return jsonify({"error": "Missing required fields: name, email, and message."}), 400
-
-    recipient_email = os.getenv('RECIPIENT_EMAIL')
-    sender_email = os.getenv('SENDER_EMAIL') # This must be a verified sender in Brevo
-
-    # The API key is now checked inside the try block via the API call
-    if not all([recipient_email, sender_email]):
-        print("ERROR: Recipient or sender email is not set.")
-        return jsonify({"error": "Server configuration error."}), 500
-
-    # Construct the email using Brevo's SDK
-    send_smtp_email = sib_api_v3_sdk.SendSmtpEmail(
-        to=[sib_api_v3_sdk.SendSmtpEmailTo(email=recipient_email)],
-        reply_to=sib_api_v3_sdk.SendSmtpEmailReplyTo(email=email, name=name),
-        sender=sib_api_v3_sdk.SendSmtpEmailSender(name="Nishil's Portfolio", email=sender_email),
-        subject=f"New Portfolio Contact from {name}: {subject}",
-        html_content=f"""
-            <h3>You have a new message from your portfolio:</h3>
-            <p><strong>Name:</strong> {name}</p>
-            <p><strong>Email:</strong> {email}</p>
-            <hr>
-            <p><strong>Message:</strong></p>
-            <p>{message_body.replace(os.linesep, '<br>')}</p>
-        """
-    )
-
     try:
-        # Send the email
-        api_instance.send_transac_email(send_smtp_email)
-        return jsonify({"message": "Thank you! Your message has been sent successfully."}), 200
+        data = request.get_json()
+        name = data.get("name")
+        email = data.get("email")
+        message = data.get("message")
+        subject = data.get("subject", "New Contact Form Message")
 
-    except ApiException as e:
-        # This will now give us the "Key not found" error if the key is wrong on Render
-        print(f"BREVO API EXCEPTION: {e.body}")
-        return jsonify({"error": "Sorry, there was a problem sending your message. Please try again later."}), 500
+        if not name or not email or not message:
+            return jsonify({"error": "All fields are required"}), 400
+
+        body = f"""
+        You have a new portfolio message:
+
+        Name: {name}
+        Email: {email}
+        Subject: {subject}
+
+        Message:
+        {message}
+        """
+
+        # Send email via Resend
+        response = requests.post(
+            "https://api.resend.com/emails",
+            headers={"Authorization": f"Bearer {RESEND_API_KEY}"},
+            json={
+                "from": SENDER_EMAIL,
+                "to": RECIPIENT_EMAIL,
+                "subject": subject,
+                "text": body,
+                "reply_to": email
+            }
+        )
+
+        if response.status_code == 200:
+            return jsonify({"message": "Thank you! Your message has been sent successfully."}), 200
+        else:
+            print("Resend error:", response.text)   # 👈 log the actual error
+            return jsonify({"error": "Failed to send message", "details": response.json()}), 500
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
-# --- Route to Serve the Frontend ---
+# --- Frontend routes ---
 @app.route('/')
 def serve_index():
     return send_from_directory(app.static_folder, 'index.html')
@@ -80,6 +74,5 @@ def serve_static_files(path):
     return send_from_directory(app.static_folder, path)
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=True)
-
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5001, debug=True)

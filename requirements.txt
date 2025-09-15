@@ -1,4 +1,4 @@
 Flask
 python-dotenv
 gunicorn
-sib-api-v3-sdk
+resend
